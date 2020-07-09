@@ -1,0 +1,6 @@
+__pycache__
+raw
+data
+node_modules
+build
+npm-debug.log
