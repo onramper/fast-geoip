@@ -43,8 +43,8 @@ Apart from the performance advantages mentioned before, this package comes with 
 - Compatible with all versions of node since 0.12 (released in february 2015)
 - Optimized for auditability (see [Implementation philosophy](#implementation-philosophy))
 - 100% test coverage
-<!--
 - Always up-to-date IP databases provided by periodic CI jobs
+<!--
 
 ## Cache
 Once all the data has been loaded into memory, queries are around 1.5 ms slower than `geoip-lite`.

@@ -83,7 +83,7 @@ jobs:
       - name: Compare new and old data
         id: compare
         run: |
-          if diff -qrN ./data ./old/node_modules/fast-geoip/data; then
+          if ! diff -qrN ./data ./old/node_modules/fast-geoip/data; then
             echo "::set-output name=changed::true"
             npm version patch
           else
