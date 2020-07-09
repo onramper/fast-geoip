@@ -39,7 +39,7 @@ Finally, to add some historical context, this library was originally built with 
 Apart from the performance advantages mentioned before, this package comes with the following extra features:
 - Zero dependencies
 - Native Typescript types
-- Simplicity: npm module only contains X lines of code
+- Simplicity: npm module is made of less than 200 lines of code
 - Compatible with all versions of node since 0.12 (released in february 2015)
 - Optimized for auditability (see [Implementation philosophy](#implementation-philosophy))
 - 100% test coverage
