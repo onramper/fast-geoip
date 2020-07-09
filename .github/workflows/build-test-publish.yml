@@ -75,11 +75,15 @@ jobs:
       - name: Build data structures
         run: python processGeoIpCsv.py
       - name: Get currently published data
-        run: npm install fast-geoip
+        run: |
+          mkdir old
+          cd old
+          npm init -y
+          npm install fast-geoip
       - name: Compare new and old data
         id: compare
         run: |
-          if diff -qrN ./data ./node_modules/fast-geoip/data; then
+          if diff -qrN ./data ./old/node_modules/fast-geoip/data; then
             echo "::set-output name=changed::true"
             npm version patch
           else
