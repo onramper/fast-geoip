@@ -87,7 +87,7 @@ jobs:
         run: |
           if ! diff -qrN ./data ./old/node_modules/fast-geoip/data; then
             echo "::set-output name=changed::true"
-            npm version patch
+            npm version patch --no-git-tag-version
           else
             echo "::set-output name=changed::false"
           fi
