@@ -49,7 +49,7 @@ function readFileChunk(path:string, offset:number, length:number): Promise<locat
   return new Promise(function (resolve, reject){
     fs.open("data/"+path, 'r', function (err, fd){
       if (err) reject(err);
-      const buf = Buffer.alloc(length)
+      const buf = Buffer.alloc == undefined? new Buffer(length) : Buffer.alloc(length)
       fs.read(fd, buf, 0, length, offset, function(err, _, buffer){
         fs.close(fd, function(){})
         if(err) reject(err);
