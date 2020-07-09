@@ -4,6 +4,9 @@ on:
   push:
     branches: [ master ]
   pull_request:
+  schedule:
+  # * is a special character in YAML so you have to quote this string
+  - cron:  '0 0 * * *'
 
 jobs:
   build:
@@ -71,12 +74,25 @@ jobs:
           MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
       - name: Build data structures
         run: python processGeoIpCsv.py
+      - name: Get currently published data
+        run: npm install fast-geoip
+      - name: Compare new and old data
+        id: compare
+        run: |
+          if diff -qrN ./data ./node_modules/fast-geoip/data; then
+            echo "::set-output name=changed::true"
+            npm version patch
+          else
+            echo "::set-output name=changed::false"
+          fi
       - run: npm publish
+        if: github.event_name == 'push' || ( steps.compare.outputs.changed == 'true' && github.event_name == 'schedule' )
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - uses: actions/setup-node@v1
         with:
           registry-url: 'https://npm.pkg.github.com'
       - run: npm publish
+        if: github.event_name == 'push' || ( steps.compare.outputs.changed == 'true' && github.event_name == 'schedule' )
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
