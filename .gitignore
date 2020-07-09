@@ -1,6 +1,8 @@
 __pycache__
+*.pyc
 raw
 data
 node_modules
 build
+tests/mock_data/*.js
 npm-debug.log

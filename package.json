@@ -25,7 +25,8 @@
     "data/*",
     "build/index.js",
     "build/index.d.ts",
-    "build/utils.js"
+    "build/utils.js",
+    "build/params.js"
   ],
   "main": "build/index.js",
   "types": "build/index.d.ts",
