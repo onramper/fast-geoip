@@ -92,7 +92,7 @@ class TestDataGenerator(unittest.TestCase):
         secondBlockIp = geoip.ipStr2Int("208.69.72.0")
         self.assertListEqual(ipIndex, [firstIp, secondBlockIp])
         for i in range(len(ipIndex)):
-            self.assertEqual(readFile(f"{i}.json", "data")[0][0], ipIndex[i])
+            self.assertEqual(readFile("%d.json" % i, "data")[0][0], ipIndex[i])
         firstBlock = readFile("0.json", "data")
         # Numerical values are recorded properly
         record = firstBlock[0]

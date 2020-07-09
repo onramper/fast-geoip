@@ -72,7 +72,7 @@ def extract_block_attrs(row, geoname_ids):
 def storeIps(ips, counter, ipIndex):
     ips = ips[:-1] + b']' # Remove the trailing comma and add ]
     ipIndex.append(json.loads(ips)[0][0]) # Store the first IP of the set into the index
-    storeFile(f"{counter}.json", ips, True)
+    storeFile("%d.json" % counter, ips, True)
 
 def ipStr2Int(strIp):
     ip = [int(e) for e in strIp.split('.')]
@@ -106,7 +106,7 @@ def generateIndexes(ipIndex):
     MID_NODES = ceil(len(ipIndex)/ROOT_NODES)
     for i in range(ROOT_NODES):
         rootIpIndex.append(ipIndex[i*MID_NODES])
-        storeFile(f"i{i}.json", json.dumps(ipIndex[i*MID_NODES:(i+1)*MID_NODES]))
+        storeFile("i%d.json" % i, json.dumps(ipIndex[i*MID_NODES:(i+1)*MID_NODES]))
 
     storeFile("index.json", json.dumps(rootIpIndex))
     return MID_NODES
@@ -117,7 +117,7 @@ def storeDynamicParams(location_record_length, num_mid_nodes):
                 "LOCATION_RECORD_SIZE": location_record_length,
                 "NUMBER_NODES_PER_MIDINDEX": num_mid_nodes
             }
-        params_file.write(f"module.exports = {json.dumps(params, indent=4)}") # Pretty-printed json
+        params_file.write("module.exports = " + json.dumps(params, indent=4)) # Pretty-printed json
 
 def main():
     removeOldData()
