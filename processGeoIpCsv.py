@@ -71,7 +71,7 @@ def extract_block_attrs(row, geoname_ids):
 
 def storeIps(ips, counter, ipIndex):
     ips = ips[:-1] + b']' # Remove the trailing comma and add ]
-    ipIndex.append(json.loads(ips)[0][0]) # Store the first IP of the set into the index
+    ipIndex.append(json.loads(ips.decode('utf-8'))[0][0]) # Store the first IP of the set into the index
     storeFile("%d.json" % counter, ips, True)
 
 def ipStr2Int(strIp):
@@ -102,8 +102,8 @@ def generateBlockFiles(geoname_ids):
 
 def generateIndexes(ipIndex):
     rootIpIndex = []
-    ROOT_NODES = floor(sqrt(len(ipIndex))) # See readme for the rationale behind this formula
-    MID_NODES = ceil(len(ipIndex)/ROOT_NODES)
+    ROOT_NODES = int(floor(sqrt(len(ipIndex)))) # See readme for the rationale behind this formula
+    MID_NODES = int(ceil(len(ipIndex)/ROOT_NODES))
     for i in range(ROOT_NODES):
         rootIpIndex.append(ipIndex[i*MID_NODES])
         storeFile("i%d.json" % i, json.dumps(ipIndex[i*MID_NODES:(i+1)*MID_NODES]))
