@@ -102,3 +102,8 @@ jobs:
         if: github.event_name == 'push' || ( steps.compare.outputs.changed == 'true' && github.event_name == 'schedule' )
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Commit version updates
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Bump version
+          file_pattern: package.json
