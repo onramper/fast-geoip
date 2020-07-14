@@ -75,7 +75,6 @@ jobs:
       - name: Build data structures
         run: |
           python processGeoIpCsv.py
-          mv params.js build
       - name: Get currently published data
         run: |
           mkdir old
