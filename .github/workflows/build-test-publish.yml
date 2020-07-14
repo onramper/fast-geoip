@@ -96,12 +96,5 @@ jobs:
         if: github.event_name == 'push' || ( steps.compare.outputs.changed == 'true' && github.event_name == 'schedule' )
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - uses: actions/setup-node@v1
-        with:
-          registry-url: 'https://npm.pkg.github.com'
-      - run: npm publish
-        if: github.event_name == 'push' || ( steps.compare.outputs.changed == 'true' && github.event_name == 'schedule' )
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Push version changes to github repo
         run: git push
