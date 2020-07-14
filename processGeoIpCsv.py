@@ -14,7 +14,7 @@ def removeOldData():
     try:
         os.mkdir(CODE_DIR)
         os.remove(PARAMS_FILE)
-    except (FileExistsError, FileNotFoundError):
+    except (OSError):
         pass
 
 def jsonify(item):
