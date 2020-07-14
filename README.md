@@ -201,4 +201,4 @@ Unfortunately this didn't yeld good results because the resulting tree was heavi
 Trying to cut the tree into chunks of a setsize also led to problems because of it's unbalanced nature, casing some paths to go through 8 different files to reach it's destination. And, while it may have been possible to come up with an algorithm that solved that problem, at this point it became clear that trying to work around an unbalanced tree by adding complexity was a much inferior approach to directly building a balanced tree using indexes.
 
 ## Acknoledgements
-Huge thanks to the creators and all contributors to `geoip-lite` for that package, which inspired this one. Also, some utility code has been copied from that package's source in order to avoid re-implementing it here.
+Huge thanks to the creators and all contributors to `geoip-lite` for that package, which inspired this one.
