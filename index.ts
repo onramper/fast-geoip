@@ -1,4 +1,5 @@
 import fs = require('fs')
+import path = require('path')
 import utils = require('./utils')
 const params = require('./params') as {
   "LOCATION_RECORD_SIZE": number,
@@ -8,6 +9,7 @@ const params = require('./params') as {
 var cacheEnabled = false;
 const ipCache:{[filename:string]:ipBlockRecord[]|indexFile} = {}
 var locationCache:Promise<locationRecord[]>;
+const DATA_DIR = path.join(path.dirname(__dirname), "data");
 
 function enableCache(){
   if(!cacheEnabled){
@@ -22,12 +24,12 @@ function enableCache(){
 type indexFile = number[]
 type ipBlockRecord = [number, number|null, number, number, number]
 
-function readFile<format extends (indexFile|ipBlockRecord[]|locationRecord[])>(path:string):Promise<format>{
-  if(cacheEnabled && ipCache[path] != undefined){
-    return Promise.resolve(ipCache[path] as format);
+function readFile<format extends (indexFile|ipBlockRecord[]|locationRecord[])>(filename:string):Promise<format>{
+  if(cacheEnabled && ipCache[filename] != undefined){
+    return Promise.resolve(ipCache[filename] as format);
   }
   return new Promise(function (resolve, reject){
-    fs.readFile("data/"+path, function (err, data) {
+    fs.readFile(path.join(DATA_DIR, filename), function (err, data) {
       if(err){
         reject(err);
       } else if(data==undefined){
@@ -36,7 +38,7 @@ function readFile<format extends (indexFile|ipBlockRecord[]|locationRecord[])>(p
         const content = JSON.parse(data.toString())
         resolve(content)
         if(cacheEnabled){
-          ipCache[path] = content;
+          ipCache[filename] = content;
         }
       }
     })
@@ -45,9 +47,9 @@ function readFile<format extends (indexFile|ipBlockRecord[]|locationRecord[])>(p
 
 type locationRecord = [string, string, string, number, string, "0" | "1"]
 
-function readFileChunk(path:string, offset:number, length:number): Promise<locationRecord>{
+function readFileChunk(filename:string, offset:number, length:number): Promise<locationRecord>{
   return new Promise(function (resolve, reject){
-    fs.open("data/"+path, 'r', function (err, fd){
+    fs.open(path.join(DATA_DIR, filename), 'r', function (err, fd){
       if (err) reject(err);
       const buf = Buffer.alloc == undefined? new Buffer(length) : Buffer.alloc(length)
       fs.read(fd, buf, 0, length, offset, function(err, _, buffer){

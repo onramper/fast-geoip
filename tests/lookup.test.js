@@ -3,12 +3,12 @@ const exec = require('child_process').execSync;
 
 // Setup
 process.chdir(__dirname + "/mock_data")
-exec("python ../../processGeoIpCsv.py")
+exec("python ../../processGeoIpCsv.py") // Also generates build/params.js
 exec("npm run build")
-exec("cp ../../build/index.js ../../build/utils.js .")
+exec("cp ../../build/index.js ../../build/utils.js build") // Files on the "files" field of package.json, the files that will be included in the package
 
-const lookup = require("./mock_data/index")
-const utils = require("./mock_data/utils")
+const lookup = require("./mock_data/build/index")
+const utils = require("./mock_data/build/utils")
 
 // ipStr2Num converts ips properly
 assert.strictEqual(utils.ipStr2Num("0.0.0.0"), 0)
@@ -106,8 +106,7 @@ testRandomIps(1e3)
 
 // Tear-down
 function tearDown() {
-  exec("rm -r data")
-  exec("rm index.js utils.js params.js")
+  exec("rm -r data build")
 }
 
 Promise.all(promises).then(tearDown)

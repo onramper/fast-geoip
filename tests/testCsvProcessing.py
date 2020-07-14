@@ -51,7 +51,7 @@ def createBlocksFile():
     "GeoLite2-City-Blocks-IPv4.csv",
     "raw")
 
-DATA_DIRECTORIES = [geoip.RAW_DATABASE_DIR, geoip.DATA_DIR]
+DATA_DIRECTORIES = [geoip.RAW_DATABASE_DIR, geoip.DATA_DIR, geoip.CODE_DIR]
 
 class TestDataGenerator(unittest.TestCase):
     def setUp(self):
@@ -122,11 +122,9 @@ class TestDataGenerator(unittest.TestCase):
                 params["NUMBER_NODES_PER_MIDINDEX"]
             )
         self.assertDictEqual(
-                json.loads(readFile("params.js", jsonParsed=False)[len("module.exports = "):]),
+                json.loads(readFile(geoip.PARAMS_FILE, jsonParsed=False)[len("module.exports = "):]),
                 params
             )
-        # Tear-down
-        os.remove("params.js")
 
     def test_all(self):
         createLocationsFile()
