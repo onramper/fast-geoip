@@ -1,6 +1,6 @@
 {
   "name": "fast-geoip",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A faster & low-memory replacement for geoip-lite, a node library that maps IPs to geographical information",
   "directories": {
     "test": "tests"
