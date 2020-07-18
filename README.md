@@ -33,7 +33,7 @@ console.log(geo);
 }
 ```
 
-Finally, to add some historical context, this library was originally built with the idea of using it for a lambda container that had to geolocate the IP of the current request, somethign that turned out to be impossible to do with `geoip-lite` because memory consumption exceeded the 126MB limit and it slowed down the lambda function by over 200ms just to query a single IP.
+Finally, to add some historical context, this library was originally built with the idea of using it for a lambda container that had to geolocate the IP of the current request, something that turned out to be impossible to do with `geoip-lite` because memory consumption exceeded the 126MB limit and it slowed down the lambda function by over 200ms just to query a single IP.
 
 ## Features
 Apart from the performance advantages mentioned before, this package comes with the following extra features:
