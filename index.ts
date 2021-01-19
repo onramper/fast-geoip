@@ -104,6 +104,9 @@ function lookup4(stringifiedIp:string): Promise<ipInfo|null> {
   var nextIp:number = utils.ipStr2Num("255.255.255.255");
   return readFile<indexFile>("index.json")
     .then(function(data){
+      // IP cannot be NaN
+      if (Object.is(ip, NaN))
+          throw "IP cannot be NaN"
       rootIndex = utils.binarySearch(data, ip, utils.identity)
       if (rootIndex == -1){
         // Ip is not in the database, return empty object
