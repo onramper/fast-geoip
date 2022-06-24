@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "strict": true,  
+    "esModuleInterop": true,
+    "skipLibCheck": false, 
+    "outDir": "build",
+    "forceConsistentCasingInFileNames": true,
+    "noUnusedLocals": true,
+    "declaration": true,
+    "noUnusedParameters": true
+  },
+  "exclude": ["node_modules", "build"]
+}
