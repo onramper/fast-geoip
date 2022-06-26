@@ -1,12 +1,6 @@
-use std::iter::{ExactSizeIterator, Iterator};
-
-pub fn bynary_search<T, F>(
-    list: impl Iterator + ExactSizeIterator,
-    item: usize,
-    extract_key_fn: F,
-) -> isize
+pub fn binary_search<F>(list: Vec<u32>, item: u32, extract_key_fn: F) -> isize
 where
-    F: FnOnce(T) -> usize,
+    F: FnOnce(u32) -> u32 + Copy,
 {
     let mut low: usize = 0;
     let mut hight: usize = list.len() - 1;
