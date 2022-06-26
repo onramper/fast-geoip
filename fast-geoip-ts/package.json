@@ -7,7 +7,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "generate": "python ../processGeoIpCsv.py",
+    "generate": "python3 ../processGeoIpCsv.py",
     "test": "node tests/lookup.test.js"
   },
   "keywords": [

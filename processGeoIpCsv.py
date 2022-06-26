@@ -3,7 +3,7 @@ from math import sqrt, floor, ceil
 
 RAW_DATABASE_DIR = "raw"
 DATA_DIR = "data"
-CODE_DIR = "build"
+CODE_DIR = "fast-geoip-ts/build"
 PARAMS_FILE = os.path.join(CODE_DIR, "params.js")
 BLOCK_SIZE = 2**12 # = 4KB, the storage block size on almost all new OSes
 FILE_SIZE = BLOCK_SIZE*12 - 100 # File size is made to be lower than the size of 12 storage blocks (minus a few bytes to account for overheads) in order to make sure that all the file's contents are directly addressed from the file's inode (preventing indirect access to storage blocks)

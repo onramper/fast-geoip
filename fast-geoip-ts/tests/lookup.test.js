@@ -3,12 +3,12 @@ const exec = require("child_process").execSync;
 
 // Setup
 process.chdir(__dirname + "/mock_data");
-exec("python3 ../../../processGeoIpCsv.py"); // Also generates build/params.js
+exec("python3 ../../processGeoIpCsv.py"); // Also generates build/params.js
 exec("npm run build");
 exec("cp ../../build/index.js ../../build/utils.js build"); // Files on the "files" field of package.json, the files that will be included in the package
 
 const lookup = require("./mock_data/build/index");
-const utils = require("./mock_data/build/utils");
+pip install certifi utils = require("./mock_data/build/utils");
 
 // ipStr2Num converts ips properly
 assert.strictEqual(utils.ipStr2Num("0.0.0.0"), 0);
