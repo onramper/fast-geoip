@@ -25,7 +25,7 @@ lazy_static! {
 //static CACHE: Lazy<Cache<&str, Vec<u32>>> = Lazy::new(|| Cache::new(10_000));
 
 #[derive(Deserialize, Copy, Clone, Debug)]
-pub struct IpBlockRecord(pub u32, Option<u32>, f32, f32, u16);
+pub struct IpBlockRecord(pub u32, pub Option<u32>, pub f32, pub f32, pub u16);
 
 static ROOT: &str = "../data";
 static CACHE_ENABLED: bool = false;
@@ -59,26 +59,21 @@ impl IpInfo {
             Ok(file) => {
                 let root_index: isize = file_binary_search(&file, ip);
 
-                println!("{:?}", root_index);
-
                 if root_index == -1 {
                     panic!("Ip not found in the database")
                 }
 
                 next_ip = Self::get_next_ip_from_u32(&file, root_index, next_ip);
 
-                println!("{:?}", next_ip);
-
                 match read_file::<u32>(&format!("i{}.json", &root_index)).await {
                     Ok(file) => {
+                        println!("{:?}", file);
                         let index = file_binary_search(&file, ip)
                             + root_index
                                 * CONFIGURATION
                                     .get("NUMBER_NODES_PER_MIDINDEX")
                                     .expect("Failed to fetch internal library parameters")
                                     .clone() as isize;
-
-                        println!("{:?}", index);
 
                         next_ip = Self::get_next_ip_from_u32(&file, index, next_ip);
 
