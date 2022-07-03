@@ -7,7 +7,6 @@ use serde::{de, Deserialize};
 use std::collections::HashMap;
 use std::io::{self, prelude::*, BufReader, SeekFrom};
 use std::path::Path;
-use std::ptr::read;
 
 lazy_static! {
     #[derive(Debug)]
@@ -42,11 +41,6 @@ pub struct IpInfo {
     pub ll: (f32, f32),
     pub metro: u32,
     pub area: u16,
-}
-
-struct Params {
-    number_nodes_per_midindex: u8,
-    location_record_size: u8,
 }
 
 impl IpInfo {
