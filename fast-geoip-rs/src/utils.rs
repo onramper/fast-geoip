@@ -54,7 +54,24 @@ pub fn ip_string_to_number(ip: &str) -> u32 {
         })
 }
 
+pub fn get_next_ip_from_u32(list: &Vec<u32>, index: isize, current_next_ip: u32) -> u32 {
+    if index < (list.len() - 1) as isize {
+        list[(index as usize) + 1]
+    } else {
+        current_next_ip
+    }
+}
+pub fn get_next_ip_from_list(list: &Vec<IpBlockRecord>, index: isize, current_next_ip: u32) -> u32 {
+    if index < (list.len() - 1) as isize {
+        list[(index as usize) + 1].0
+    } else {
+        current_next_ip
+    }
+}
+
 mod tests {
+    use std::vec;
+
     use super::*;
     #[test]
     fn correct_ip_coercion_from_string_to_number() {
@@ -104,5 +121,36 @@ mod tests {
         assert_eq!(file_binary_search(&vector, 888), -1);
         assert_eq!(file_binary_search(&vector, 1332005376), 0);
         assert_eq!(file_binary_search(&vector, 1367713952), 45);
+    }
+
+    #[test]
+    fn check_get_next_ip_from_u32() {
+        let vector = vec![
+            16777216, 215847616, 405506300, 411992648, 415585080, 528520704, 657015552, 770659072,
+            791871848, 852198784, 1022158848, 1085783672, 1119839112, 1137455691, 1162573792,
+            1178574660, 1194028568, 1210833984, 1247001600, 1266922156, 1295092736, 1332005376,
+            1374974400, 1419378176, 1456418816, 1496017408, 1538054304, 1577040512, 1612057344,
+            1632493704, 1650749084, 1667828224, 1746688526, 1806626816, 1860815616, 2010064896,
+            2152622080, 2300287184, 2432522316, 2548832960, 2728089312, 2891497472, 2917421056,
+            2976535552, 3040461568, 3109009408, 3151085568, 3197208320, 3247320064, 3321163776,
+            3388725248, 3478742016, 3521994112, 3589718136, 3706301024,
+        ];
+        assert_eq!(get_next_ip_from_u32(&vector, 21, 4294967295), 1374974400)
+    }
+
+    #[test]
+    fn check_get_next_ip_from_list() {
+        let vector = vec![
+            IpBlockRecord(1360953344, Some(65028), 50.1536, 18.8317, 20),
+            IpBlockRecord(1360953600, Some(65222), 50.2527, 19.0284, 10),
+            IpBlockRecord(1360953728, Some(64564), 49.9749, 18.9339, 20),
+            IpBlockRecord(1360953856, Some(9774), 52.2394, 21.0362, 200),
+            IpBlockRecord(1360954368, Some(64181), 50.1299, 18.9861, 20),
+            IpBlockRecord(1360954624, Some(64482), 49.8517, 18.8875, 20),
+            IpBlockRecord(1360954880, Some(64181), 50.1299, 18.9861, 5),
+            IpBlockRecord(1360955392, Some(64221), 50.4526, 18.8571, 50),
+        ];
+
+        assert_eq!(get_next_ip_from_list(&vector, 2, 1360953344), 1360953856)
     }
 }

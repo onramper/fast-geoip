@@ -1,6 +1,8 @@
-use crate::utils::{file_binary_search, ip_string_to_number, item_binary_search};
+use crate::utils::{
+    file_binary_search, get_next_ip_from_list, get_next_ip_from_u32, ip_string_to_number,
+    item_binary_search,
+};
 use config::{Config, File, FileFormat};
-use futures::AsyncReadExt;
 use moka::sync::Cache;
 use once_cell::sync::Lazy;
 use serde::{de, Deserialize};
@@ -22,6 +24,10 @@ lazy_static! {
 }
 
 //static CACHE: Lazy<Cache<&str, Vec<u32>>> = Lazy::new(|| Cache::new(10_000));
+
+// TODO: check number type
+#[derive(Deserialize, Debug)]
+struct LocationRecord(String, String, String, u32, String, String);
 
 #[derive(Deserialize, Copy, Clone, Debug)]
 pub struct IpBlockRecord(pub u32, pub Option<u32>, pub f32, pub f32, pub u16);
@@ -57,7 +63,7 @@ impl IpInfo {
                     panic!("Ip not found in the database")
                 }
 
-                next_ip = Self::get_next_ip_from_u32(&file, root_index, next_ip);
+                next_ip = get_next_ip_from_u32(&file, root_index, next_ip);
 
                 match read_file::<u32>(&format!("i{}.json", &root_index)).await {
                     Ok(file) => {
@@ -68,7 +74,7 @@ impl IpInfo {
                                     .expect("Failed to fetch internal library parameters")
                                     .clone() as isize;
 
-                        next_ip = Self::get_next_ip_from_u32(&file, index, next_ip);
+                        next_ip = get_next_ip_from_u32(&file, index, next_ip);
 
                         match read_file::<IpBlockRecord>(&format!("{index}.json")).await {
                             Ok(file) => {
@@ -80,7 +86,7 @@ impl IpInfo {
                                     panic!("1: IP doesn't any region nor country associated");
                                 };
 
-                                next_ip = Self::get_next_ip_from_list(&file, index, next_ip);
+                                next_ip = get_next_ip_from_list(&file, index, next_ip);
 
                                 match read_location_record(ip_data.1.unwrap()).await {
                                     Ok(data) => Ok(IpInfo {
@@ -106,26 +112,7 @@ impl IpInfo {
             _ => panic!("Failed to read the internal index file"),
         }
     }
-
-    fn get_next_ip_from_u32(list: &Vec<u32>, index: isize, current_next_ip: u32) -> u32 {
-        if index < (list.len() - 1) as isize {
-            list[(index as usize) + 1]
-        } else {
-            current_next_ip
-        }
-    }
-    fn get_next_ip_from_list(list: &Vec<IpBlockRecord>, index: isize, current_next_ip: u32) -> u32 {
-        if index < (list.len() - 1) as isize {
-            list[(index as usize) + 1].0
-        } else {
-            current_next_ip
-        }
-    }
 }
-
-// TODO: check number type
-#[derive(Deserialize, Debug)]
-struct LocationRecord(String, String, String, u32, String, String);
 
 async fn read_location_record(index: u32) -> io::Result<LocationRecord> {
     let location_record_size = CONFIGURATION
