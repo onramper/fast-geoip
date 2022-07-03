@@ -14,6 +14,8 @@ futures = "0.3.21"
 moka = "0.8.5"
 once_cell = "1.12.0"
 async-fs = "1.5.0"
-serde = "1.0.137"
+serde = {version = "1.0.137", features = ["derive"] }
 serde_bytes = "0.11.6"
 serde_json = "1.0.81"
+config = {version= "0.13.1", features = ["json"]}
+lazy_static = "1.4.0"

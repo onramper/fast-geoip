@@ -9,6 +9,7 @@ fast-geoip-ts/npm-debug.log
 geolite.zip
 fast-geoip-rs/debug/
 fast-geoip-rs/target/
+fast-geoip-rs/params.json
 
 fast-geoip-rs/Cargo.lock
 

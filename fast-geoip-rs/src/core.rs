@@ -1,106 +1,201 @@
-use crate::utils::{binary_search, ip_string_to_number};
+use crate::utils::{file_binary_search, ip_string_to_number, item_binary_search};
+use config::{Config, File, FileFormat};
+use futures::AsyncReadExt;
 use moka::sync::Cache;
 use once_cell::sync::Lazy;
-use std::io::BufReader;
+use serde::{de, Deserialize};
+use std::collections::HashMap;
+use std::io::{self, prelude::*, BufReader, SeekFrom};
 use std::path::Path;
+use std::ptr::read;
 
-static CACHE: Lazy<Cache<&str, Vec<u32>>> = Lazy::new(|| Cache::new(10_000));
+lazy_static! {
+    #[derive(Debug)]
+    static ref CONFIGURATION: HashMap<String, usize> = {
+        let config_builder = Config::builder().add_source(File::new("params", FileFormat::Json));
+
+        let config = config_builder
+            .build()
+            .expect("Failed to load the internal library configuration");
+
+        config.try_deserialize::<HashMap<String, usize>>().unwrap()
+    };
+}
+
+//static CACHE: Lazy<Cache<&str, Vec<u32>>> = Lazy::new(|| Cache::new(10_000));
+
+#[derive(Deserialize, Copy, Clone, Debug)]
+pub struct IpBlockRecord(pub u32, Option<u32>, f32, f32, u16);
 
 static ROOT: &str = "../data";
 static CACHE_ENABLED: bool = false;
 
 #[derive(Debug)]
 pub struct IpInfo {
-    range: (u64, u64),
+    range: (u32, u32),
     country: String,
     region: String,
-    eu: bool,
+    // TODO: check if possible transform to a boolean
+    eu: String, // "1" | "0"
     timezone: String,
     city: String,
     ll: (f32, f32),
     metro: u32,
-    area: u32,
+    area: u16,
 }
 
-#[derive(Clone)]
-//struct FileFormat<'a> {
-//index_file: u8,
-//// TODO: Check types for ip_block_record and location_record
-//ip_block_record: Vec<(u8, Option<u8>, u8, u8, u8)>,
-//location_record: Vec<(&'a str, &'a str, &'a str, u8, &'a str, bool)>,
-//}
-
-struct FileFormat<'a>(
-    u8,
-    Vec<(u8, Option<u8>, u8, u8, u8)>,
-    Vec<(&'a str, &'a str, &'a str, u8, &'a str, bool)>,
-);
+struct Params {
+    number_nodes_per_midindex: u8,
+    location_record_size: u8,
+}
 
 impl IpInfo {
     pub async fn lookup4(ipv4: &str) -> std::io::Result<Self> {
         let ip = ip_string_to_number(ipv4);
 
-        let mut root_index: isize;
-
         let mut next_ip = ip_string_to_number("255.255.255.255".into());
 
-        let file = FileFormat::read_file("index.json")
-            .await
-            .expect("Failed to read the file.");
+        match read_file::<u32>("index.json").await {
+            Ok(file) => {
+                let root_index: isize = file_binary_search(&file, ip);
 
-        root_index = binary_search(file, ip, |x| x);
+                println!("{:?}", root_index);
 
-        if root_index == -1 {
-            panic!("Ip not found in the database")
+                if root_index == -1 {
+                    panic!("Ip not found in the database")
+                }
+
+                next_ip = Self::get_next_ip_from_u32(&file, root_index, next_ip);
+
+                println!("{:?}", next_ip);
+
+                match read_file::<u32>(&format!("i{}.json", &root_index)).await {
+                    Ok(file) => {
+                        let index = file_binary_search(&file, ip)
+                            + root_index
+                                * CONFIGURATION
+                                    .get("NUMBER_NODES_PER_MIDINDEX")
+                                    .expect("Failed to fetch internal library parameters")
+                                    .clone() as isize;
+
+                        println!("{:?}", index);
+
+                        next_ip = Self::get_next_ip_from_u32(&file, index, next_ip);
+
+                        match read_file::<IpBlockRecord>(&format!("{index}.json")).await {
+                            Ok(file) => {
+                                let index = item_binary_search(&file, ip);
+
+                                let ip_data = file[index as usize];
+
+                                if ip_data.1 == None {
+                                    panic!("1: IP doesn't any region nor country associated");
+                                };
+
+                                println!("{:?}", ip_data);
+                                next_ip = Self::get_next_ip_from_list(&file, index, next_ip);
+
+                                match read_location_record(ip_data.1.unwrap()).await {
+                                    Ok(data) => Ok(IpInfo {
+                                        range: (ip_data.0, next_ip),
+                                        country: data.0,
+                                        region: data.1,
+                                        eu: data.5,
+                                        timezone: data.4,
+                                        city: data.2,
+                                        ll: (ip_data.2, ip_data.3),
+                                        metro: data.3,
+                                        area: ip_data.4,
+                                    }),
+                                    _ => panic!("2: IP doesn't any region nor country associated"),
+                                }
+                            }
+                            _ => panic!("IP doesn't any region nor country associated"),
+                        }
+                    }
+                    _ => panic!("Failed to read the next index file."),
+                }
+            }
+            _ => panic!("Failed to read the internal index file"),
         }
-
-        Ok(IpInfo {
-            range: (0, 0),
-            country: "IT".to_string(),
-            region: "25".to_string(),
-            eu: true,
-            timezone: "Europe/Rome".to_string(),
-            city: "Milan".to_string(),
-            ll: (0.0, 0.0),
-            metro: 0,
-            area: 20,
-        })
-        //next_ip = Self::get_next_ip(file, index, current_next_ip, extract_key_fn)
     }
 
-    //fn get_next_ip<F>(
-    //list: Vec<FileFormat>,
-    //index: usize,
-    //current_next_ip: u8,
-    //extract_key_fn: F,
-    //) -> u8
-    //where
-    //F: FnOnce(FileFormat) -> u8,
-    //{
-    //if index < (list.len() - 1) {
-    //extract_key_fn(list[index + 1])
-    //} else {
-    //current_next_ip
-    //}
-    //}
+    fn get_next_ip_from_u32(list: &Vec<u32>, index: isize, current_next_ip: u32) -> u32 {
+        if index < (list.len() - 1) as isize {
+            list[(index as usize) + 1]
+        } else {
+            current_next_ip
+        }
+    }
+    fn get_next_ip_from_list(list: &Vec<IpBlockRecord>, index: isize, current_next_ip: u32) -> u32 {
+        if index < (list.len() - 1) as isize {
+            list[(index as usize) + 1].0
+        } else {
+            current_next_ip
+        }
+    }
 }
 
-impl<'a> FileFormat<'a> {
-    async fn read_file(file_name: &'static str) -> std::io::Result<Vec<u32>> {
-        if CACHE_ENABLED && CACHE.get(&file_name).is_some() {
-            return Ok(CACHE.get(&file_name).unwrap());
-        }
+// TODO: check number type
+#[derive(Deserialize, Debug)]
+struct LocationRecord(String, String, String, u32, String, String);
 
-        let file = async_fs::read(Path::new(ROOT).join(file_name))
-            .await
-            .expect("Failed to read the file. Filename: {file_name}");
+async fn read_location_record(index: u32) -> io::Result<LocationRecord> {
+    let location_record_size = CONFIGURATION
+        .get("LOCATION_RECORD_SIZE")
+        .expect("Failed to read the params internal file");
 
-        let json: Vec<u32> = serde_json::from_reader(BufReader::new(file.as_slice())).unwrap();
+    read_file_chunk::<LocationRecord>(
+        "locations.json",
+        ((index as usize) * location_record_size + 1) as u64,
+        location_record_size - 1,
+    )
+    .await
+}
 
-        if CACHE_ENABLED {
-            CACHE.insert(file_name, json.clone())
-        }
+async fn read_file_chunk<'b, T: serde::de::DeserializeOwned>(
+    file_name: &str,
+    offset: u64,
+    lenght: usize,
+) -> io::Result<T> {
+    // TODO: read file async
+    let mut file =
+        std::fs::File::open(Path::new(ROOT).join(file_name)).expect("Location file not found");
 
-        Ok(json)
-    }
+    let mut reader = vec![0; lenght];
+
+    file.seek(SeekFrom::Start(offset))
+        .expect("Failed to seek test start of the search buffer.");
+
+    file.read_exact(&mut reader)
+        .expect("Failed to read the searched buffer.");
+
+    let buffer = BufReader::new(reader.as_slice());
+
+    // TODO: Close opened file?
+    let result: T = serde_json::from_reader(buffer)
+        .expect("Unable to deserialize the locations.json chunk file.");
+
+    Ok(result)
+}
+
+async fn read_file<'a, T: serde::de::DeserializeOwned>(file_name: &str) -> std::io::Result<Vec<T>> {
+    //if CACHE_ENABLED && CACHE.get(&file_name).is_some() {
+    //return Ok(CACHE.get(&file_name).unwrap());
+    //}
+
+    let file = async_fs::read(Path::new(ROOT).join(file_name))
+        .await
+        .expect("Failed to read the file. Filename: {file_name}");
+
+    let buffer = BufReader::new(file.as_slice());
+
+    // TODO: maybe ::from_string() is more fast
+    let json: Vec<T> = serde_json::from_reader(buffer).unwrap();
+
+    //if CACHE_ENABLED {
+    //CACHE.insert(file_name, json.clone())
+    //}
+
+    Ok(json)
 }
