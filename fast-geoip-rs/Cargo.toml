@@ -19,3 +19,6 @@ serde_bytes = "0.11.6"
 serde_json = "1.0.81"
 config = {version= "0.13.1", features = ["json"]}
 lazy_static = "1.4.0"
+
+[dev-dependencies]
+tokio = {version = "1.19.2", features = ["macros", "rt"]}

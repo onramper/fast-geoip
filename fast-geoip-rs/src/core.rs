@@ -30,18 +30,18 @@ pub struct IpBlockRecord(pub u32, pub Option<u32>, pub f32, pub f32, pub u16);
 static ROOT: &str = "../data";
 static CACHE_ENABLED: bool = false;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct IpInfo {
-    range: (u32, u32),
-    country: String,
-    region: String,
+    pub range: (u32, u32),
+    pub country: String,
+    pub region: String,
     // TODO: check if possible transform to a boolean
-    eu: String, // "1" | "0"
-    timezone: String,
-    city: String,
-    ll: (f32, f32),
-    metro: u32,
-    area: u16,
+    pub eu: String, // "1" | "0"
+    pub timezone: String,
+    pub city: String,
+    pub ll: (f32, f32),
+    pub metro: u32,
+    pub area: u16,
 }
 
 struct Params {
