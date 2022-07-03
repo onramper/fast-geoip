@@ -67,7 +67,6 @@ impl IpInfo {
 
                 match read_file::<u32>(&format!("i{}.json", &root_index)).await {
                     Ok(file) => {
-                        println!("{:?}", file);
                         let index = file_binary_search(&file, ip)
                             + root_index
                                 * CONFIGURATION
@@ -87,7 +86,6 @@ impl IpInfo {
                                     panic!("1: IP doesn't any region nor country associated");
                                 };
 
-                                println!("{:?}", ip_data);
                                 next_ip = Self::get_next_ip_from_list(&file, index, next_ip);
 
                                 match read_location_record(ip_data.1.unwrap()).await {

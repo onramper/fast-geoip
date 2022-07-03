@@ -28,12 +28,7 @@ pub fn file_binary_search(list: &Vec<u32>, item: u32) -> isize {
 
     loop {
         let index: usize = (((((high as f32) - (low as f32)) / 2.0) as f32).round() as usize) + low;
-        println!(
-            "binay search index: {index}; low: {low}; high: {high}; list {:?}",
-            list.len()
-        );
 
-        println!("item: {item}, list[i]]: {}", list[index]);
         if item < list[index] {
             if index == high && index == low {
                 return -1;
