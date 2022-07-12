@@ -51,6 +51,15 @@ Once all the data has been loaded into memory, queries are around 1.5 ms slower 
 
 -->
 
+## Manually Updating The Geo Data
+Every release of this package will have the most updated data, but if you want to update without installing a new version, this is how:
+```shell
+MAXMIND_LICENSE_KEY=<your key> python downloadDatabases.py
+python processGeoIpCsv.py
+
+```
+(automate this with a cronjob or whatnot, in production)
+
 ## Benchmarks
 Benchmarks were taken on my workstation and should be straightforward to reproduce with the scripts provided in this repo. HDD benchmarks were taken in an old laptop. Specs of both machines are the following:
 
