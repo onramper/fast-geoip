@@ -51,50 +51,50 @@ jobs:
       - run: npm install
       - run: npm test
 
-#   publish:
-#     needs: [build, python-test, js-test]
-#     if: ( github.event_name == 'push' && github.ref == 'refs/heads/master' ) || github.event_name == 'schedule'
-#     runs-on: ubuntu-20.04
-#     steps:
-#       - uses: actions/checkout@v3
-#       - uses: actions/setup-node@v3
-#         with: 
-#           node-version: '18.x'
-#           registry-url: 'https://registry.npmjs.org'
-#       - name: Set up Python
-#         uses: actions/setup-python@v4
-#         with:
-#           python-version: 3.12
-#       - run: npm ci 
-#       - name: Build typescript files
-#         run: npm run build
-#       - name: Download csv databases
-#         run: python downloadDatabases.py
-#         env:
-#           MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
-#       - name: Build data structures
-#         run: |
-#           python processGeoIpCsv.py
-#       - name: Get currently published data
-#         run: |
-#           mkdir old
-#           cd old
-#           npm init -y
-#           npm install fast-geoip
-#       - name: Compare new and old data
-#         id: compare
-#         run: |
-#           if ! diff -qrN ./data ./old/node_modules/fast-geoip/data; then
-#             echo "::set-output name=changed::true"
-#             git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-#             git config user.name "$GITHUB_ACTOR"
-#             npm version patch 
-#           else
-#             echo "::set-output name=changed::false"
-#           fi
-#       - run: npm publish
-#         if: github.event_name == 'push' || ( steps.compare.outputs.changed == 'true' && github.event_name == 'schedule' )
-#         env:
-#           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-#       - name: Push version changes to github repo
-#         run: git push
+  publish:
+    needs: [build, python-test, js-test]
+    if: ( github.event_name == 'push' && github.ref == 'refs/heads/master' ) || github.event_name == 'schedule'
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with: 
+          node-version: '19.x'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+      - run: npm ci 
+      - name: Build typescript files
+        run: npm run build
+      - name: Download csv databases
+        run: python downloadDatabases.py
+        env:
+          MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
+      - name: Build data structures
+        run: |
+          python processGeoIpCsv.py
+      - name: Get currently published data
+        run: |
+          mkdir old
+          cd old
+          npm init -y
+          npm install fast-geoip
+      - name: Compare new and old data
+        id: compare
+        run: |
+          if ! diff -qrN ./data ./old/node_modules/fast-geoip/data; then
+            echo "::set-output name=changed::true"
+            git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+            git config user.name "$GITHUB_ACTOR"
+            npm version patch 
+          else
+            echo "::set-output name=changed::false"
+          fi
+      - run: npm publish
+        if: github.event_name == 'push' || ( steps.compare.outputs.changed == 'true' && github.event_name == 'schedule' )
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Push version changes to github repo
+        run: git push
