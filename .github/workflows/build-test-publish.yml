@@ -10,18 +10,18 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
       - name: Get Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '12.x'
+          node-version: '19.x'
       - run: npm ci
       - run: npm run build
 
   python-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         python-version: [2.7, 3.5, 3.6, 3.7, 3.8, 3.9, 3.10, 3.11, 3.12]
@@ -59,12 +59,12 @@ jobs:
 #       - uses: actions/checkout@v3
 #       - uses: actions/setup-node@v3
 #         with: 
-#           node-version: '12.x'
+#           node-version: '18.x'
 #           registry-url: 'https://registry.npmjs.org'
 #       - name: Set up Python
 #         uses: actions/setup-python@v4
 #         with:
-#           python-version: 3.8
+#           python-version: 3.12
 #       - run: npm ci 
 #       - name: Build typescript files
 #         run: npm run build
