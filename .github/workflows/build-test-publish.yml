@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Get Node.js
@@ -21,7 +21,7 @@ jobs:
       - run: npm run build
 
   python-test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: [2.7, 3.5, 3.6, 3.7, 3.8, 3.9, 3.10, 3.11, 3.12]
@@ -31,6 +31,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+          architecture: x86
       - name: Test with unittest
         run: |
           python tests/testCsvProcessing.py
@@ -65,6 +66,7 @@ jobs:
 #         uses: actions/setup-python@v4
 #         with:
 #           python-version: 3.12
+#           architecture: x86
 #       - run: npm ci 
 #       - name: Build typescript files
 #         run: npm run build
