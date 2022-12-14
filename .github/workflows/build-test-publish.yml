@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
       - name: Get Node.js
@@ -21,7 +21,7 @@ jobs:
       - run: npm run build
 
   python-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         python-version: [2.7, 3.5, 3.6, 3.7, 3.8, 3.9, 3.10, 3.11, 3.12]
@@ -31,7 +31,6 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          architecture: x86
       - name: Test with unittest
         run: |
           python tests/testCsvProcessing.py
@@ -55,7 +54,7 @@ jobs:
 #   publish:
 #     needs: [build, python-test, js-test]
 #     if: ( github.event_name == 'push' && github.ref == 'refs/heads/master' ) || github.event_name == 'schedule'
-#     runs-on: ubuntu-latest
+#     runs-on: ubuntu-20.04
 #     steps:
 #       - uses: actions/checkout@v3
 #       - uses: actions/setup-node@v3
@@ -66,7 +65,6 @@ jobs:
 #         uses: actions/setup-python@v4
 #         with:
 #           python-version: 3.12
-#           architecture: x86
 #       - run: npm ci 
 #       - name: Build typescript files
 #         run: npm run build
