@@ -1,7 +1,7 @@
 {
-  "name": "fast-geoip",
+  "name": "doc999tor-fast-geoip",
   "version": "1.1.88",
-  "description": "A faster & low-memory replacement for geoip-lite, a node library that maps IPs to geographical information",
+  "description": "Fork of a faster & low-memory replacement for geoip-lite, a node library that maps IPs to geographical information",
   "directories": {
     "test": "tests"
   },
@@ -17,9 +17,9 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/corollari/fast-geoip.git"
+    "url": "git+https://github.com/Doc999tor/fast-geoip.git"
   },
-  "author": "corollari",
+  "author": "doc999tor",
   "license": "MIT",
   "files": [
     "data/*",
@@ -31,7 +31,7 @@
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "devDependencies": {
-    "@types/node": "^14.0.20",
-    "typescript": "^3.9.6"
+    "@types/node": "^18.7.23",
+    "typescript": "^4.8.3"
   }
 }
