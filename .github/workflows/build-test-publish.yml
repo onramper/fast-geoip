@@ -16,7 +16,7 @@ jobs:
       - name: Get Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: '12.x'
+          node-version: '16.x'
       - run: npm ci
       - run: npm run build
 
@@ -57,7 +57,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v3
         with:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
@@ -80,11 +80,11 @@ jobs:
           mkdir old
           cd old
           npm init -y
-          npm install fast-geoip
+          npm install doc999tor-fast-geoip
       - name: Compare new and old data
         id: compare
         run: |
-          if ! diff -qrN ./data ./old/node_modules/fast-geoip/data; then
+          if ! diff -qrN ./data ./old/node_modules/doc999tor-fast-geoip/data; then
             echo "::set-output name=changed::true"
             git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
             git config user.name "$GITHUB_ACTOR"
