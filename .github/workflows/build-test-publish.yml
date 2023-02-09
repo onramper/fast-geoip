@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [2.7, 3.5, 3.6, 3.7, 3.8]
+        python-version: [3.6, 3.7, 3.8]
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [ '10', '12', '14' ] # Major releases as described in https://nodejs.org/en/download/releases/
+        node: [ '10', '12', '14' , '16' ] # Major releases as described in https://nodejs.org/en/download/releases/
     name: Node ${{ matrix.node }} sample
     steps:
       - uses: actions/checkout@v3
@@ -59,7 +59,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: '12.x'
+          node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
       - name: Set up Python
         uses: actions/setup-python@v2
