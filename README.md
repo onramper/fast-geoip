@@ -1,10 +1,14 @@
+# :warning: unmaintained!
+
+Please note that this repository was not updated for a while and seems to be unmaintained. If you want to use this, have a look at the forks instead.
+
 # fast-geoip
 > A faster & low-memory replacement for geoip-lite, a node library that maps IPs to geographical information
 
 ## Summary
 This library provides an interface to efficiently query MaxMind's GeoLite databases, which contain geolocation information for IPs. Concretely, this was created as an alternative to `geoip-lite` that adapts better to use-cases where either a low memory footprint is needed, not many IPs will be examined through the library or a high start-up overhead is unacceptable.
 
-Concretely, what `geoip-lite` does is that, on startup, it reads the whole database from disk, parses it and puts it all on memory, thus this results in the startup time being increased by about ~233 ms along with an increase of memory being used by the process of around ~110 MB, in exchange for any new queries being resolved with low sub-millisecond latencies (~0.02 ms). 
+Concretely, what `geoip-lite` does is that, on startup, it reads the whole database from disk, parses it and puts it all on memory, thus this results in the startup time being increased by about ~233 ms along with an increase of memory being used by the process of around ~110 MB, in exchange for any new queries being resolved with low sub-millisecond latencies (~0.02 ms).
 
 This works if you have a long-running process that will need to geolocate a lot of IPs and don't care about the increases in memory usage nor startup time, but if, for example, your use-case requires only geolocating a single IP, these trade-offs don't make much sense as only a small part of the satabase is needed to answer that query, not all of it.
 
@@ -103,7 +107,7 @@ The values in the `Subsequent queries` tab are calculated by taking the median o
     </tbody>
 </table>
 
-Note that generally you won't make queries sequentially but aynschronously, so take the following graphs with a pinch of salt. With that being said, the graphs do a great job at illustrating the "huge overhead & fast queries" vs "no overhead & slow queries" dicotomy. 
+Note that generally you won't make queries sequentially but aynschronously, so take the following graphs with a pinch of salt. With that being said, the graphs do a great job at illustrating the "huge overhead & fast queries" vs "no overhead & slow queries" dicotomy.
 ![SSD cold cache performance](images/ssd-cold-perf.png) ![HDD cold cache performance](images/hdd-cold-perf.png)
 
 ### Memory
@@ -170,10 +174,10 @@ Note that an alternate solution could have been to put the split files into othe
 
 After we have already split all of our files, we need to choose the size of our indexes. An optimal solution for this problem can be achieved by minimizing the equation `x + y`, where `x` is the size of the root index and `y` the size of the middle index, while maintaining the constraint `x * y = n`, where `n` is the number of files that the database has been split into.
 
-Minimizing that equation leads to the following solution `x = y = sqrt(n)`. 
+Minimizing that equation leads to the following solution `x = y = sqrt(n)`.
 
 ## Implementation philosophy
-A major source of inspiration in this design comes from the essay [“Worse is Better”](https://en.wikipedia.org/wiki/Worse_is_better), which posits that simplicity, especially implementation simplicity, is a key contributor to the success of a system. 
+A major source of inspiration in this design comes from the essay [“Worse is Better”](https://en.wikipedia.org/wiki/Worse_is_better), which posits that simplicity, especially implementation simplicity, is a key contributor to the success of a system.
 I believe that simplicity in both design and implementation is especially important for an npm package, as, apart from the obviously lower bug rate that comes with a simpler implementation, it provides an invaluable property: the ability for anyone to easily audit the code and make sure that it does what it's meant to do and nothing more.
 This may seem useless in this day and age, where it's common to have a node\_modules directory with thousands of packages, but I firmly believe that by making it possible for people to read all the code in a package in under one hour, some people will actually do it, and even if only a few do, these provide guarantees for everyone else that is consuming the library, as, if something turns out to be wrong with the library, the few that audit the code will make it known to everyone else.
 
@@ -194,9 +198,9 @@ While this is certainly true, such a new system would introduce new complexity t
 - Performance might not increase as much as you think. Profiling the library reveals that a very little amount of time is spent on json parsing.
 
 ## Alternative architectures tested
-When I was prototyping this library one of the ideas I tried was building a binary tree which would use the bits of an IP as it's path to it's geo information. 
+When I was prototyping this library one of the ideas I tried was building a binary tree which would use the bits of an IP as it's path to it's geo information.
 
-Unfortunately this didn't yeld good results because the resulting tree was heavily unbalanced, which made it so cutting it into seperate files at standard heights resulted in a lot of very small files which ended up heavily bloating the filesystem (eg: a file with a single record would weight only ~15 bytes but because of how filesystems are structured it would need to take up the space of a whole disk block, ~4kB in modern OSes). 
+Unfortunately this didn't yeld good results because the resulting tree was heavily unbalanced, which made it so cutting it into seperate files at standard heights resulted in a lot of very small files which ended up heavily bloating the filesystem (eg: a file with a single record would weight only ~15 bytes but because of how filesystems are structured it would need to take up the space of a whole disk block, ~4kB in modern OSes).
 
 Trying to cut the tree into chunks of a setsize also led to problems because of it's unbalanced nature, casing some paths to go through 8 different files to reach it's destination. And, while it may have been possible to come up with an algorithm that solved that problem, at this point it became clear that trying to work around an unbalanced tree by adding complexity was a much inferior approach to directly building a balanced tree using indexes.
 
