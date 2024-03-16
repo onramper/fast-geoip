@@ -16,7 +16,7 @@ jobs:
       - name: Get Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: '12.x'
+          node-version: '16.x'
       - run: npm ci
       - run: npm run build
 
@@ -24,11 +24,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [2.7, 3.5, 3.6, 3.7, 3.8]
+        python-version: [3.7, 3.8]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - name: Test with unittest
@@ -40,12 +40,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [ '0.12', '4', '6', '8', '10', '12', '14' ] # Major releases as described in https://nodejs.org/en/download/releases/
+        node: [ '10', '12', '14' , '16' ] # Major releases as described in https://nodejs.org/en/download/releases/
     name: Node ${{ matrix.node }} sample
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
       - run: npm install
@@ -56,16 +56,16 @@ jobs:
     if: ( github.event_name == 'push' && github.ref == 'refs/heads/master' ) || github.event_name == 'schedule'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: '12.x'
+          node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.8
-      - run: npm ci 
+      - run: npm ci
       - name: Build typescript files
         run: npm run build
       - name: Download csv databases
@@ -80,15 +80,15 @@ jobs:
           mkdir old
           cd old
           npm init -y
-          npm install fast-geoip
+          npm install doc999tor-fast-geoip
       - name: Compare new and old data
         id: compare
         run: |
-          if ! diff -qrN ./data ./old/node_modules/fast-geoip/data; then
+          if ! diff -qrN ./data ./old/node_modules/doc999tor-fast-geoip/data; then
             echo "::set-output name=changed::true"
             git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
             git config user.name "$GITHUB_ACTOR"
-            npm version patch 
+            npm version patch
           else
             echo "::set-output name=changed::false"
           fi
