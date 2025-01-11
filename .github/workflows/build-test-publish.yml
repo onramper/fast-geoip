@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v2
       - name: Get Node.js
@@ -21,7 +21,7 @@ jobs:
       - run: npm run build
 
   python-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         python-version: [3.7, 3.8]
@@ -37,7 +37,7 @@ jobs:
 
   js-test:
     needs: [build, python-test]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         node: [ '10', '12', '14' , '16' ] # Major releases as described in https://nodejs.org/en/download/releases/
@@ -54,7 +54,7 @@ jobs:
   publish:
     needs: [build, python-test, js-test]
     if: ( github.event_name == 'push' && github.ref == 'refs/heads/master' ) || github.event_name == 'schedule'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
