@@ -7,7 +7,7 @@ TEMPORAL_EXTRACTED_DIR = "geoip"
 def rmtree(directory):
     shutil.rmtree(directory, ignore_errors=True)
 
-urllib.request.urlretrieve ("https://geoip.maxmind.com/app/geoip_download?edition_id=GeoLite2-City-CSV&suffix=zip&license_key=" + os.environ["MAXMIND_LICENSE_KEY"], ZIP_FILENAME)
+urllib.request.urlretrieve ("https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City-CSV&suffix=zip&license_key=" + os.environ["MAXMIND_LICENSE_KEY"], ZIP_FILENAME)
 
 with zipfile.ZipFile(ZIP_FILENAME, 'r') as zip_ref:
     zip_ref.extractall(TEMPORAL_EXTRACTED_DIR)
